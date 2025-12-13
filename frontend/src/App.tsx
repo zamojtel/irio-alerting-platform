@@ -1,12 +1,23 @@
-import { Providers } from "@/providers";
-import { SignupForm } from "@/components/signup-form";
+import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { routeTree } from './routeTree.gen';
+import { Providers } from './providers';
+
+const router = createRouter({
+  routeTree,
+  defaultPreload: 'intent',
+  scrollRestoration: true,
+});
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 function App() {
   return (
     <Providers>
-      <div className="w-lg mx-auto mt-50">
-        <SignupForm />
-      </div>
+      <RouterProvider router={router} />
     </Providers>
   );
 }

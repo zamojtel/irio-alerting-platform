@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"sync"
 
 	"github.com/caarlos0/env/v11"
@@ -11,6 +12,8 @@ const PROD = "prod"
 
 type Config struct {
 	Env              string `env:"ENV" default:"dev"`
+	Secret           string `env:"SECRET,required"`
+	Port             int    `env:"PORT" default:"8080"`
 	PostgresHost     string `env:"POSTGRES_HOST,required"`
 	PostgresPort     string `env:"POSTGRES_PORT,required"`
 	PostgresDB       string `env:"POSTGRES_DB,required"`
@@ -29,7 +32,7 @@ func GetConfig() *Config {
 		err := env.Parse(cfg)
 
 		if err != nil {
-			panic(err)
+			log.Fatal("Failed to parse env vars: ", err)
 		}
 	})
 

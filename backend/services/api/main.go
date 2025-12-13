@@ -1,32 +1,43 @@
 package main
 
 import (
-	"alerting-platform/common/db"
-	"context"
+	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"alerting-platform/api/controllers"
+	"alerting-platform/api/middleware"
+	"alerting-platform/common/config"
+
+	jwt "github.com/appleboy/gin-jwt/v3"
 )
 
 func main() {
-	conn := db.GetRawDBConnection()
-	defer conn.Close()
-
-	var count int
-
-	row := conn.QueryRowContext(context.Background(), "SELECT COUNT(*) FROM services WHERE deleted_at IS NULL")
-	err := row.Scan(&count)
-
-	if err != nil {
-		panic(err)
+	if config.GetConfig().Env == config.PROD {
+		gin.SetMode(gin.ReleaseMode)
 	}
 
-	println("Active services count:", count)
-
 	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": conn.Stats().InUse,
-		})
-	})
-	router.Run() // listens on 0.0.0.0:8080 by default
+
+	router.Use(middleware.GetSecurityMiddleware())
+	router.Use(middleware.GetCORSMiddleware())
+
+	authMiddleware, err := jwt.New(middleware.GetJWTMiddleware())
+	if err != nil {
+		log.Fatal("JWT Error:" + err.Error())
+	}
+
+	errInit := authMiddleware.MiddlewareInit()
+	if errInit != nil {
+		log.Fatal("authMiddleware.MiddlewareInit() Error:" + errInit.Error())
+	}
+
+	controllers.RegisterRoutes(router, authMiddleware)
+
+	port := config.GetConfig().Port
+	if err = http.ListenAndServe(":"+strconv.Itoa(port), router); err != nil {
+		log.Fatal(err)
+	}
 }

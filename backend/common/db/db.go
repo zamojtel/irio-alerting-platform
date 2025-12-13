@@ -4,6 +4,7 @@ import (
 	"alerting-platform/common/config"
 	"database/sql"
 	"fmt"
+	"log"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -19,7 +20,7 @@ func GetRawDBConnection() *sql.DB {
 	}
 
 	if err != nil {
-		panic(fmt.Sprintf("Failed to connect to DB: %v", err))
+		log.Fatal("Failed to connect to DB: ", err)
 	}
 
 	return db
