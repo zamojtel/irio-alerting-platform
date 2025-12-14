@@ -8,12 +8,13 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
-	r.NoRoute(authMiddleware.MiddlewareFunc(), handleNoRoute())
+	r.NoRoute(handleNoRoute())
 
 	v1 := r.Group("/v1")
 
 	v1.POST("/login", authMiddleware.LoginHandler)
 	v1.POST("/refresh", authMiddleware.RefreshHandler)
+	v1.POST("/users", RegisterUser)
 
 	authenticated := v1.Group("/", authMiddleware.MiddlewareFunc())
 	{

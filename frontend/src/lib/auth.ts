@@ -15,6 +15,11 @@ export type LoginDTO = {
   password: string;
 };
 
+export type RegisterDTO = {
+  email: string;
+  password: string;
+};
+
 export const login = ({ email, password }: LoginDTO) => {
   return axios.post<JWT>("/login", {
     email,
@@ -29,7 +34,7 @@ export const register = ({
   email: string;
   password: string;
 }) => {
-  return axios.post("/users/", {
+  return axios.post("/users", {
     email,
     password,
   });

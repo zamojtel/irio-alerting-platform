@@ -8,163 +8,163 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as UnauthenticatedRouteImport } from "./routes/_unauthenticated";
-import { Route as AuthenticatedRouteImport } from "./routes/_authenticated";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as UnauthenticatedSignUpRouteImport } from "./routes/_unauthenticated/sign-up";
-import { Route as UnauthenticatedSignInRouteImport } from "./routes/_unauthenticated/sign-in";
-import { Route as AuthenticatedAlertsRouteImport } from "./routes/_authenticated/alerts";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnauthenticatedRouteImport } from './routes/_unauthenticated'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as UnauthenticatedSignUpRouteImport } from './routes/_unauthenticated/sign-up'
+import { Route as UnauthenticatedSignInRouteImport } from './routes/_unauthenticated/sign-in'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
-  id: "/_unauthenticated",
+  id: '/_unauthenticated',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: "/_authenticated",
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const UnauthenticatedSignUpRoute = UnauthenticatedSignUpRouteImport.update({
-  id: "/sign-up",
-  path: "/sign-up",
+  id: '/sign-up',
+  path: '/sign-up',
   getParentRoute: () => UnauthenticatedRoute,
-} as any);
+} as any)
 const UnauthenticatedSignInRoute = UnauthenticatedSignInRouteImport.update({
-  id: "/sign-in",
-  path: "/sign-in",
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => UnauthenticatedRoute,
-} as any);
+} as any)
 const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
-  id: "/alerts",
-  path: "/alerts",
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => AuthenticatedRoute,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/alerts": typeof AuthenticatedAlertsRoute;
-  "/sign-in": typeof UnauthenticatedSignInRoute;
-  "/sign-up": typeof UnauthenticatedSignUpRoute;
+  '/': typeof IndexRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/sign-in': typeof UnauthenticatedSignInRoute
+  '/sign-up': typeof UnauthenticatedSignUpRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/alerts": typeof AuthenticatedAlertsRoute;
-  "/sign-in": typeof UnauthenticatedSignInRoute;
-  "/sign-up": typeof UnauthenticatedSignUpRoute;
+  '/': typeof IndexRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/sign-in': typeof UnauthenticatedSignInRoute
+  '/sign-up': typeof UnauthenticatedSignUpRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/_authenticated": typeof AuthenticatedRouteWithChildren;
-  "/_unauthenticated": typeof UnauthenticatedRouteWithChildren;
-  "/_authenticated/alerts": typeof AuthenticatedAlertsRoute;
-  "/_unauthenticated/sign-in": typeof UnauthenticatedSignInRoute;
-  "/_unauthenticated/sign-up": typeof UnauthenticatedSignUpRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
+  '/_unauthenticated/sign-in': typeof UnauthenticatedSignInRoute
+  '/_unauthenticated/sign-up': typeof UnauthenticatedSignUpRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/alerts" | "/sign-in" | "/sign-up";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/alerts" | "/sign-in" | "/sign-up";
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/alerts' | '/sign-in' | '/sign-up'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/alerts' | '/sign-in' | '/sign-up'
   id:
-    | "__root__"
-    | "/"
-    | "/_authenticated"
-    | "/_unauthenticated"
-    | "/_authenticated/alerts"
-    | "/_unauthenticated/sign-in"
-    | "/_unauthenticated/sign-up";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/_unauthenticated'
+    | '/_authenticated/alerts'
+    | '/_unauthenticated/sign-in'
+    | '/_unauthenticated/sign-up'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren;
-  UnauthenticatedRoute: typeof UnauthenticatedRouteWithChildren;
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  UnauthenticatedRoute: typeof UnauthenticatedRouteWithChildren
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/_unauthenticated": {
-      id: "/_unauthenticated";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof UnauthenticatedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_authenticated": {
-      id: "/_authenticated";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof AuthenticatedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_unauthenticated/sign-up": {
-      id: "/_unauthenticated/sign-up";
-      path: "/sign-up";
-      fullPath: "/sign-up";
-      preLoaderRoute: typeof UnauthenticatedSignUpRouteImport;
-      parentRoute: typeof UnauthenticatedRoute;
-    };
-    "/_unauthenticated/sign-in": {
-      id: "/_unauthenticated/sign-in";
-      path: "/sign-in";
-      fullPath: "/sign-in";
-      preLoaderRoute: typeof UnauthenticatedSignInRouteImport;
-      parentRoute: typeof UnauthenticatedRoute;
-    };
-    "/_authenticated/alerts": {
-      id: "/_authenticated/alerts";
-      path: "/alerts";
-      fullPath: "/alerts";
-      preLoaderRoute: typeof AuthenticatedAlertsRouteImport;
-      parentRoute: typeof AuthenticatedRoute;
-    };
+    '/_unauthenticated': {
+      id: '/_unauthenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof UnauthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_unauthenticated/sign-up': {
+      id: '/_unauthenticated/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof UnauthenticatedSignUpRouteImport
+      parentRoute: typeof UnauthenticatedRoute
+    }
+    '/_unauthenticated/sign-in': {
+      id: '/_unauthenticated/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof UnauthenticatedSignInRouteImport
+      parentRoute: typeof UnauthenticatedRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute;
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
-};
+}
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren
-);
+  AuthenticatedRouteChildren,
+)
 
 interface UnauthenticatedRouteChildren {
-  UnauthenticatedSignInRoute: typeof UnauthenticatedSignInRoute;
-  UnauthenticatedSignUpRoute: typeof UnauthenticatedSignUpRoute;
+  UnauthenticatedSignInRoute: typeof UnauthenticatedSignInRoute
+  UnauthenticatedSignUpRoute: typeof UnauthenticatedSignUpRoute
 }
 
 const UnauthenticatedRouteChildren: UnauthenticatedRouteChildren = {
   UnauthenticatedSignInRoute: UnauthenticatedSignInRoute,
   UnauthenticatedSignUpRoute: UnauthenticatedSignUpRoute,
-};
+}
 
 const UnauthenticatedRouteWithChildren = UnauthenticatedRoute._addFileChildren(
-  UnauthenticatedRouteChildren
-);
+  UnauthenticatedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   UnauthenticatedRoute: UnauthenticatedRouteWithChildren,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

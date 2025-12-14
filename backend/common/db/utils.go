@@ -10,14 +10,8 @@ import (
 )
 
 func GetRawDBConnection() *sql.DB {
-	var db *sql.DB
-	var err error
-
-	if config.GetConfig().Env == config.DEV {
-		db, err = connectLocal()
-	} else {
-		db, err = connectLocal()
-	}
+	connectionString := GetConnectionString()
+	db, err := sql.Open("pgx", connectionString)
 
 	if err != nil {
 		log.Fatal("Failed to connect to DB: ", err)
@@ -26,19 +20,14 @@ func GetRawDBConnection() *sql.DB {
 	return db
 }
 
-func connectLocal() (*sql.DB, error) {
+func GetConnectionString() string {
 	config := config.GetConfig()
 
-	connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
 		config.PostgresHost,
 		config.PostgresUser,
 		config.PostgresPassword,
 		config.PostgresDB,
 		config.PostgresPort,
 	)
-
-	return sql.Open("pgx", connectionString)
 }
-
-// func connectCloudSQL() (*sql.DB, error) {
-// }

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"alerting-platform/api/controllers"
+	"alerting-platform/api/db"
 	"alerting-platform/api/middleware"
 	"alerting-platform/common/config"
 )
@@ -16,6 +17,9 @@ func main() {
 	if config.GetConfig().Env == config.PROD {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	dbConn := db.GetDBConnection()
+	dbConn.AutoMigrate(&db.User{})
 
 	router := gin.Default()
 

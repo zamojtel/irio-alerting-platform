@@ -1,8 +1,9 @@
 package middleware
 
 import (
+	"alerting-platform/api/db"
 	"alerting-platform/api/dto"
-	"alerting-platform/api/models"
+	"alerting-platform/api/utils"
 	"alerting-platform/common/config"
 	"log"
 	"time"
@@ -55,21 +56,25 @@ func authenticator() func(c *gin.Context) (any, error) {
 		email := loginVals.Email
 		password := loginVals.Password
 
-		// TODO: tu trzeba pobrać użytkownika z bazy danych. Czy to trzeba będzie cachować?
-		if (email == "admin@g.com" && password == "password") || (email == "test@g.com" && password == "password") {
-			return &models.User{
-				Email: email,
-			}, nil
+		conn := db.GetDBConnection()
+		var user db.User
+		result := conn.Where("email = ?", email).First(&user)
+		if result.Error != nil {
+			return nil, jwt.ErrFailedAuthentication
 		}
 
-		return nil, jwt.ErrFailedAuthentication
+		if !utils.IsPasswordHashCorrect(password, user.PasswordHash) {
+			return nil, jwt.ErrFailedAuthentication
+		}
+
+		return &user, nil
 	}
 }
 
 func identityHandler() func(c *gin.Context) any {
 	return func(c *gin.Context) any {
 		claims := jwt.ExtractClaims(c)
-		return &models.User{
+		return &db.User{
 			Email: claims[identityKey].(string),
 		}
 	}
@@ -77,7 +82,7 @@ func identityHandler() func(c *gin.Context) any {
 
 func payloadFunc() func(data any) jwt_go.MapClaims {
 	return func(data any) jwt_go.MapClaims {
-		if v, ok := data.(*models.User); ok {
+		if v, ok := data.(*db.User); ok {
 			return jwt_go.MapClaims{
 				identityKey: v.Email,
 			}

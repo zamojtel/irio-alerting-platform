@@ -12,14 +12,10 @@ import { Link } from "@tanstack/react-router";
 
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
+import type { RegisterDTO } from "@/lib/auth";
 
-type SignupFormProps = React.ComponentProps<typeof Card> & {
-  onSubmit?: (data: {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) => void;
+type SignupFormProps = Omit<React.ComponentProps<typeof Card>, "onSubmit"> & {
+  onSubmit?: (data: RegisterDTO) => void;
 };
 
 const formSchema = z
@@ -35,7 +31,7 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-export function SignupForm({ ...props }: SignupFormProps) {
+export function SignupForm({ onSubmit, ...props }: SignupFormProps) {
   const form = useForm({
     defaultValues: {
       email: "",
@@ -46,7 +42,7 @@ export function SignupForm({ ...props }: SignupFormProps) {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      onSubmit?.(value);
     },
   });
 
