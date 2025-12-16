@@ -1,16 +1,41 @@
 services:
   db:
-    image: postgres:18
+    image: postgres:17
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - internal_network
+  api:
+    build:
+      context: ./backend
+      dockerfile: ./services/api/Dockerfile
+    environment:
+      ENV: ${ENV}
+      SECRET: ${SECRET}
+      PORT: ${PORT}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - internal_network
+
   redis:
     image: redis:8
     command:

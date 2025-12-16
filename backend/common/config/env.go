@@ -23,8 +23,8 @@ type Config struct {
 	RedisHost        string `env:"REDIS_HOST,required"`
 	RedisPort        string `env:"REDIS_PORT,required"`
 	RedisDB          int    `env:"REDIS_DB" default:"0"`
-	RedisPassword    string `env:"REDIS_PASSWORD" required:""`
-	RedisPrefix      string `env:"REDIS_PREFIX" required:""`
+	RedisPassword    string `env:"REDIS_PASSWORD,required"`
+	RedisPrefix      string `env:"REDIS_PREFIX,required"`
 }
 
 var (

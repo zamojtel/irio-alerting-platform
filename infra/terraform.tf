@@ -1,0 +1,121 @@
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 7.0.0"
+    }
+  }
+}
+
+provider "google" {
+  project = "leafy-tenure-475014-a1"
+  region  = "europe-west1"
+}
+
+resource "google_artifact_registry_repository" "docker_registry" {
+  repository_id = "docker-registry"
+  format       = "DOCKER"
+}
+
+## Bucket
+
+resource "google_storage_bucket" "static_assets" {
+  name     = "alerting-platform-static-assets"
+  location = "EU"
+
+  force_destroy = true
+  uniform_bucket_level_access = true
+
+  website {
+    main_page_suffix = "index.html"
+    not_found_page   = "index.html"
+  }
+}
+
+resource "google_storage_bucket_iam_member" "public_access" {
+  bucket = google_storage_bucket.static_assets.name
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
+}
+
+## Load Balancer
+
+resource "google_compute_backend_bucket" "static_assets_backend" {
+  name        = "static-assets-backend"
+  bucket_name = google_storage_bucket.static_assets.name
+
+  enable_cdn = true  
+
+  # TODO: sprawdź ustawienia cdn
+}
+
+resource "google_compute_url_map" "url_map" {
+  name            = "alerting-platform-url-map"
+  default_service = google_compute_backend_bucket.static_assets_backend.id
+}
+
+resource "google_compute_target_http_proxy" "http_proxy" {
+  name    = "alerting-platform-http-proxy"
+  url_map = google_compute_url_map.url_map.id
+}
+
+resource "google_compute_global_forwarding_rule" "http_forwarding_rule" {
+  name       = "alerting-platform-http-forwarding-rule"
+  target     = google_compute_target_http_proxy.http_proxy.id
+  port_range = "80"
+  ip_protocol = "TCP"
+}
+
+## Database
+
+resource "google_sql_database_instance" "alerting_platform_db" {
+  name             = "alerting-platform-db"
+  database_version = "POSTGRES_17"
+
+  deletion_protection = false
+
+  settings {
+    tier = "db-f1-micro"
+    edition = "ENTERPRISE"
+  }
+}
+
+resource "google_sql_user" "db_user" {
+  instance = google_sql_database_instance.alerting_platform_db.name
+  name     = var.db_user
+  password = var.db_password
+}
+
+resource "google_sql_database" "alerting_platform_database" {
+  name     = "alerting_platform"
+  instance = google_sql_database_instance.alerting_platform_db.name
+}
+
+resource "google_redis_instance" "alerting_platform_redis" {
+  name           = "alerting-platform-redis"
+  tier           = "BASIC"
+
+  memory_size_gb = 1
+  deletion_protection = false
+}
+
+## GKE
+
+resource "google_container_cluster" "alerting_platform_gke" {
+  name     = "alerting-platform-gke"
+
+  initial_node_count       = 1
+  remove_default_node_pool = true
+
+  # cluster_autoscaling {
+  #   enabled = true
+
+  #   resource_limits {
+  #     resource_type = "cpu"
+  #     minimum       = 1
+  #     maximum       = 10
+  #   }
+  # }
+
+  deletion_protection = false
+}

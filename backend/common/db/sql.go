@@ -9,7 +9,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func GetRawDBConnection() *sql.DB {
+func CreateRawDBConnection() *sql.DB {
 	connectionString := GetConnectionString()
 	db, err := sql.Open("pgx", connectionString)
 
