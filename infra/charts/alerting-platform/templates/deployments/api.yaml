@@ -17,6 +17,7 @@ spec:
       containers:
         - name: alerting-platform-api
           image: "{{ .Values.gcloud.registryURL }}/alerting-platform-api:latest"
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.env.API_PORT }}
           env:
@@ -31,6 +32,12 @@ spec:
                   name: {{ $.Release.Name }}-secrets
                   key: {{ $key | quote }}
           {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.env.API_PORT }}
+            initialDelaySeconds: 30
+            periodSeconds: 5
         - name: cloud-sql-proxy
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.20.0
           args:

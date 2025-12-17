@@ -53,6 +53,15 @@ resource "google_compute_backend_bucket" "static_assets_backend" {
   # TODO: sprawdź ustawienia cdn
 }
 
+resource "google_compute_global_address" "frontend_ip" {
+  name = "alerting-platform-frontend-ip"
+}
+
+resource "google_compute_global_address" "backend_ip" {
+  name = "alerting-platform-backend-ip"
+}
+
+
 resource "google_compute_url_map" "url_map" {
   name            = "alerting-platform-url-map"
   default_service = google_compute_backend_bucket.static_assets_backend.id
@@ -68,6 +77,8 @@ resource "google_compute_global_forwarding_rule" "http_forwarding_rule" {
   target      = google_compute_target_http_proxy.http_proxy.id
   port_range  = "80"
   ip_protocol = "TCP"
+
+  ip_address = google_compute_global_address.frontend_ip.address
 }
 
 ## Database
@@ -130,7 +141,7 @@ resource "google_container_node_pool" "primary_nodes" {
 
   autoscaling {
     min_node_count = 1
-    max_node_count = 3
+    max_node_count = 1
   }
 
   node_config {

@@ -1,5 +1,8 @@
-output "load_balancer_ip" {
-  value = google_compute_global_forwarding_rule.http_forwarding_rule.ip_address
+output "frontend_ip_address" {
+  value = google_compute_global_address.frontend_ip.address
+}
+output "backend_ip_address" {
+  value = google_compute_global_address.backend_ip.address
 }
 
 output "bucket_name" {

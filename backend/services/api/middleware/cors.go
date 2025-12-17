@@ -18,7 +18,7 @@ func GetCORSMiddleware() gin.HandlerFunc {
 		return cors.New(corsConfig)
 	}
 
-	corsConfig.AllowOrigins = []string{"https://your-production-domain.com"}
+	corsConfig.AllowOrigins = []string{"http://136.110.170.18"}
 
 	return cors.New(corsConfig)
 }
