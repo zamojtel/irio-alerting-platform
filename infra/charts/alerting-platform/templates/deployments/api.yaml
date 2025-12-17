@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alerting-platform-api
+  labels:
+    app: alerting-platform-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alerting-platform-api
+  template:
+    metadata:
+      labels:
+        app: alerting-platform-api
+    spec:
+      containers:
+        - name: alerting-platform-api
+          image: "{{ .Values.gcloud.registryURL }}/alerting-platform-api:latest"
+          ports:
+            - containerPort: {{ .Values.env.API_PORT }}
+          env:
+          {{- range $key, $value := .Values.env }}
+            - name: {{ $key | quote }}
+              value: {{ $value | required (print "Missing value: " $key) | quote }}
+          {{- end }}
+          {{- range $key, $value := .Values.secrets }}
+            - name: {{ $key | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-secrets
+                  key: {{ $key | quote }}
+          {{- end }}
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.20.0
+          args:
+            - "--port"
+            - {{ .Values.env.POSTGRES_PORT | quote }}
+            - "{{ .Values.gcloud.projectID }}:{{ .Values.gcloud.region }}:{{ .Values.gcloud.dbInstance }}"

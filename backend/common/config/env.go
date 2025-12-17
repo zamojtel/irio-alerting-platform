@@ -14,7 +14,7 @@ const PROD = "prod"
 type Config struct {
 	Env              string `env:"ENV" default:"dev"`
 	Secret           string `env:"SECRET,required"`
-	Port             int    `env:"PORT" default:"8080"`
+	APIPort          int    `env:"API_PORT" default:"8080"`
 	PostgresHost     string `env:"POSTGRES_HOST,required"`
 	PostgresPort     string `env:"POSTGRES_PORT,required"`
 	PostgresDB       string `env:"POSTGRES_DB,required"`

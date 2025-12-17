@@ -4,17 +4,21 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 7.0.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 3.0.0"
+    }
   }
 }
 
 provider "google" {
-  project = "leafy-tenure-475014-a1"
-  region  = "europe-west1"
+  project = var.project_id
+  region  = var.region
 }
 
 resource "google_artifact_registry_repository" "docker_registry" {
   repository_id = "docker-registry"
-  format       = "DOCKER"
+  format        = "DOCKER"
 }
 
 ## Bucket
@@ -23,7 +27,7 @@ resource "google_storage_bucket" "static_assets" {
   name     = "alerting-platform-static-assets"
   location = "EU"
 
-  force_destroy = true
+  force_destroy               = true
   uniform_bucket_level_access = true
 
   website {
@@ -32,7 +36,7 @@ resource "google_storage_bucket" "static_assets" {
   }
 }
 
-resource "google_storage_bucket_iam_member" "public_access" {
+resource "google_storage_bucket_iam_member" "public_bucket_access" {
   bucket = google_storage_bucket.static_assets.name
   role   = "roles/storage.objectViewer"
   member = "allUsers"
@@ -44,7 +48,7 @@ resource "google_compute_backend_bucket" "static_assets_backend" {
   name        = "static-assets-backend"
   bucket_name = google_storage_bucket.static_assets.name
 
-  enable_cdn = true  
+  enable_cdn = true
 
   # TODO: sprawdź ustawienia cdn
 }
@@ -60,62 +64,81 @@ resource "google_compute_target_http_proxy" "http_proxy" {
 }
 
 resource "google_compute_global_forwarding_rule" "http_forwarding_rule" {
-  name       = "alerting-platform-http-forwarding-rule"
-  target     = google_compute_target_http_proxy.http_proxy.id
-  port_range = "80"
+  name        = "alerting-platform-http-forwarding-rule"
+  target      = google_compute_target_http_proxy.http_proxy.id
+  port_range  = "80"
   ip_protocol = "TCP"
 }
 
 ## Database
 
-resource "google_sql_database_instance" "alerting_platform_db" {
+resource "google_sql_database_instance" "db_instance" {
   name             = "alerting-platform-db"
   database_version = "POSTGRES_17"
 
   deletion_protection = false
 
   settings {
-    tier = "db-f1-micro"
+    tier    = "db-f1-micro"
     edition = "ENTERPRISE"
   }
 }
 
 resource "google_sql_user" "db_user" {
-  instance = google_sql_database_instance.alerting_platform_db.name
+  instance = google_sql_database_instance.db_instance.name
   name     = var.db_user
   password = var.db_password
 }
 
-resource "google_sql_database" "alerting_platform_database" {
-  name     = "alerting_platform"
-  instance = google_sql_database_instance.alerting_platform_db.name
+resource "google_sql_database" "api_db" {
+  name     = "alerting_platform_api"
+  instance = google_sql_database_instance.db_instance.name
 }
 
-resource "google_redis_instance" "alerting_platform_redis" {
-  name           = "alerting-platform-redis"
-  tier           = "BASIC"
+# Without this you cannot connect to Cloud SQL
+resource "google_project_service" "sql_admin" {
+  service = "sqladmin.googleapis.com"
 
-  memory_size_gb = 1
+  disable_on_destroy = false
+}
+
+resource "google_redis_instance" "redis" {
+  name = "alerting-platform-redis"
+  tier = "BASIC"
+
+  auth_enabled        = true
+  memory_size_gb      = 1
   deletion_protection = false
 }
 
 ## GKE
 
-resource "google_container_cluster" "alerting_platform_gke" {
-  name     = "alerting-platform-gke"
+resource "google_container_cluster" "gke" {
+  name = "alerting-platform-gke"
 
   initial_node_count       = 1
   remove_default_node_pool = true
 
-  # cluster_autoscaling {
-  #   enabled = true
-
-  #   resource_limits {
-  #     resource_type = "cpu"
-  #     minimum       = 1
-  #     maximum       = 10
-  #   }
-  # }
-
   deletion_protection = false
+}
+
+resource "google_container_node_pool" "primary_nodes" {
+  name    = "primary-node-pool"
+  cluster = google_container_cluster.gke.name
+
+  node_count = 1
+
+  autoscaling {
+    min_node_count = 1
+    max_node_count = 3
+  }
+
+  node_config {
+    machine_type = "e2-micro"
+    spot         = true
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
 }

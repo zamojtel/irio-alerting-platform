@@ -1,0 +1,23 @@
+# Note: null values need to be set via --set
+
+gcloud:
+  projectID: null
+  region: null
+  dbInstance: null
+  registryURL: null
+
+env:
+  ENV: "prod"
+  API_PORT: 8080
+  POSTGRES_HOST: "127.0.0.1"
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: null
+  POSTGRES_DB: null
+  REDIS_HOST: null
+  REDIS_PORT: null
+  REDIS_DB: 0
+
+secrets:
+  SECRET: secret # TODO: To powinno być gdzieś indziej ustawiane
+  POSTGRES_PASSWORD: null
+  REDIS_PASSWORD: null

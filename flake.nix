@@ -28,6 +28,7 @@
 
               # Other
               gnumake
+              kubernetes-helm
             ];
 
             shellHook = ''

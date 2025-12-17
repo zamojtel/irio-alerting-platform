@@ -30,7 +30,7 @@ func main() {
 
 	controllers.RegisterRoutes(router, authMiddleware)
 
-	port := config.GetConfig().Port
+	port := config.GetConfig().APIPort
 	if err := http.ListenAndServe(":"+strconv.Itoa(port), router); err != nil {
 		log.Fatal(err)
 	}
