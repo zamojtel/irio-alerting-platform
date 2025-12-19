@@ -22,6 +22,9 @@
               go
               golangci-lint
               evans
+              protobuf
+              protoc-gen-go
+              protoc-gen-go-grpc
 
               # Frontend
               pnpm
@@ -31,9 +34,6 @@
               gnumake
               kubernetes-helm
               infracost
-              protobuf
-              protoc-gen-go
-              protoc-gen-go-grpc
             ];
 
             shellHook = ''

@@ -11,22 +11,17 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link, useRouter } from "@tanstack/react-router";
-import { HeartPulse, User2, ChevronUp } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { HeartPulse, User2, LogOut } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@/lib/context";
 import { toast } from "sonner";
 import { logout } from "@/lib/auth";
+import { Button } from "../ui/button";
 
 const items = [
   {
-    title: "Alerts",
-    url: "/alerts",
+    title: "Monitored Services",
+    url: "/services",
     icon: HeartPulse,
   },
   {
@@ -88,23 +83,19 @@ export const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> {email}
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top">
-                <DropdownMenuItem onClick={handleLogout}>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <div className="flex items-center justify-between p-2">
+          <div className="flex items-center gap-2">
+            <User2 /> {email}
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleLogout}
+            className="hover:cursor-pointer"
+          >
+            <LogOut />
+          </Button>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

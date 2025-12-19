@@ -5,7 +5,7 @@ export const Route = createFileRoute("/_unauthenticated")({
   component: RouteComponent,
   beforeLoad: async () => {
     if (useGlobalContext.getState().isLoggedIn) {
-      throw redirect({ to: "/alerts" });
+      throw redirect({ to: "/services" });
     }
   },
 });

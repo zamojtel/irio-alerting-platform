@@ -14,7 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnauthenticatedSignUpRouteImport } from './routes/_unauthenticated/sign-up'
 import { Route as UnauthenticatedSignInRouteImport } from './routes/_unauthenticated/sign-in'
-import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
+import { Route as AuthenticatedServicesRouteImport } from './routes/_authenticated/services'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
   id: '/_unauthenticated',
@@ -39,21 +39,21 @@ const UnauthenticatedSignInRoute = UnauthenticatedSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => UnauthenticatedRoute,
 } as any)
-const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
+const AuthenticatedServicesRoute = AuthenticatedServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/alerts': typeof AuthenticatedAlertsRoute
+  '/services': typeof AuthenticatedServicesRoute
   '/sign-in': typeof UnauthenticatedSignInRoute
   '/sign-up': typeof UnauthenticatedSignUpRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/alerts': typeof AuthenticatedAlertsRoute
+  '/services': typeof AuthenticatedServicesRoute
   '/sign-in': typeof UnauthenticatedSignInRoute
   '/sign-up': typeof UnauthenticatedSignUpRoute
 }
@@ -62,21 +62,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
-  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
+  '/_authenticated/services': typeof AuthenticatedServicesRoute
   '/_unauthenticated/sign-in': typeof UnauthenticatedSignInRoute
   '/_unauthenticated/sign-up': typeof UnauthenticatedSignUpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alerts' | '/sign-in' | '/sign-up'
+  fullPaths: '/' | '/services' | '/sign-in' | '/sign-up'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alerts' | '/sign-in' | '/sign-up'
+  to: '/' | '/services' | '/sign-in' | '/sign-up'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/_unauthenticated'
-    | '/_authenticated/alerts'
+    | '/_authenticated/services'
     | '/_unauthenticated/sign-in'
     | '/_unauthenticated/sign-up'
   fileRoutesById: FileRoutesById
@@ -124,22 +124,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthenticatedSignInRouteImport
       parentRoute: typeof UnauthenticatedRoute
     }
-    '/_authenticated/alerts': {
-      id: '/_authenticated/alerts'
-      path: '/alerts'
-      fullPath: '/alerts'
-      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+    '/_authenticated/services': {
+      id: '/_authenticated/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof AuthenticatedServicesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
+  AuthenticatedServicesRoute: typeof AuthenticatedServicesRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
+  AuthenticatedServicesRoute: AuthenticatedServicesRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
