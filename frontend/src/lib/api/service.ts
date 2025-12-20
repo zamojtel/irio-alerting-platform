@@ -22,6 +22,24 @@ export type MonitoredService = {
   status: ServiceStatus;
 };
 
+export type Granularity = "month" | "week" | "day" | "hour" | "minute";
+
+export type StatusMetricsEntry = {
+  timestamp: string;
+  success: number;
+  total: number;
+};
+
+export type ExtendedStatusMetricsEntry = StatusMetricsEntry & {
+  uptime: number;
+  error: number;
+};
+
+export type StatusMetrics = {
+  granularity: Granularity;
+  data: StatusMetricsEntry[];
+};
+
 export const useGetMyServices = () =>
   useQuery({
     queryKey: [CacheKeys.MyServices],

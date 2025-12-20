@@ -34,3 +34,7 @@ export const requireNotNullish = <T>(
   }
   return value;
 };
+
+export const unreachable = (v: never): never => {
+  throw new Error(`Unreachable case: ${v}`);
+};
