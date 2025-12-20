@@ -40,6 +40,36 @@ export type StatusMetrics = {
   data: StatusMetricsEntry[];
 };
 
+export type Incident = {
+  id: string;
+  events: IncidentEvent[];
+};
+
+export type IncidentEvent =
+  | {
+      timestamp: string;
+      type: "START";
+    }
+  | {
+      timestamp: string;
+      type: "RESOLVED";
+      oncaller: string;
+    }
+  | {
+      timestamp: string;
+      type: "UNRESOLVED";
+    }
+  | {
+      timestamp: string;
+      type: "NOTIFIED";
+      oncaller: string;
+    }
+  | {
+      timestamp: string;
+      type: "TIMEOUT";
+      oncaller: string;
+    };
+
 export const useGetMyServices = () =>
   useQuery({
     queryKey: [CacheKeys.MyServices],

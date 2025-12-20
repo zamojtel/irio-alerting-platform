@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useGetService,
+  type Incident,
   type MonitoredService,
   type StatusMetrics,
 } from "@/lib/api/service";
@@ -16,6 +17,13 @@ import {
   DeleteServiceButton,
   UpdateServiceButton,
 } from "@/components/custom/service-button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { IncidentTimeline } from "@/components/custom/incident-timeline";
 
 export const Route = createFileRoute("/_authenticated/services/$serviceID")({
   component: RouteComponent,
@@ -39,14 +47,16 @@ function RouteComponent() {
           <Tabs defaultValue="graph">
             <TabsList>
               <TabsTrigger value="graph">Graph</TabsTrigger>
-              <TabsTrigger value="logs">Logs</TabsTrigger>
+              <TabsTrigger value="logs">Incident Logs</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
             <div className="mt-10">
               <TabsContent value="graph">
                 <GraphTab />
               </TabsContent>
-              <TabsContent value="logs"></TabsContent>
+              <TabsContent value="logs">
+                <LogsTab />
+              </TabsContent>
               <TabsContent value="settings">
                 <SettingsTab service={requireNotNullish(service)} />
               </TabsContent>
@@ -157,5 +167,97 @@ const GraphTab = () => {
     <div>
       <MetricsGraph metrics={dummyData} />
     </div>
+  );
+};
+
+const LogsTab = () => {
+  const dummyIncidents: Incident[] = [
+    {
+      id: "incident-1",
+      events: [
+        { timestamp: "2024-10-01T02:15:00Z", type: "START" },
+        {
+          timestamp: "2024-10-01T02:20:00Z",
+          type: "NOTIFIED",
+          oncaller: "john.doe",
+        },
+        {
+          timestamp: "2024-10-01T02:45:00Z",
+          type: "RESOLVED",
+          oncaller: "john.doe",
+        },
+      ],
+    },
+    {
+      id: "incident-2",
+      events: [
+        { timestamp: "2024-10-02T14:30:00Z", type: "START" },
+        {
+          timestamp: "2024-10-02T14:35:00Z",
+          type: "NOTIFIED",
+          oncaller: "jane.smith",
+        },
+        {
+          timestamp: "2024-10-02T15:30:00Z",
+          type: "TIMEOUT",
+          oncaller: "jane.smith",
+        },
+        {
+          timestamp: "2024-10-02T15:35:00Z",
+          type: "NOTIFIED",
+          oncaller: "alice.jones",
+        },
+        {
+          timestamp: "2024-10-02T16:00:00Z",
+          type: "RESOLVED",
+          oncaller: "alice.jones",
+        },
+      ],
+    },
+    {
+      id: "incident-3",
+      events: [
+        { timestamp: "2024-10-02T14:30:00Z", type: "START" },
+        {
+          timestamp: "2024-10-02T14:35:00Z",
+          type: "NOTIFIED",
+          oncaller: "jane.smith",
+        },
+        {
+          timestamp: "2024-10-02T15:30:00Z",
+          type: "TIMEOUT",
+          oncaller: "jane.smith",
+        },
+        {
+          timestamp: "2024-10-02T15:35:00Z",
+          type: "NOTIFIED",
+          oncaller: "alice.jones",
+        },
+        {
+          timestamp: "2024-10-02T16:00:00Z",
+          type: "TIMEOUT",
+          oncaller: "alice.jones",
+        },
+        {
+          timestamp: "2024-10-02T16:05:00Z",
+          type: "UNRESOLVED",
+        },
+      ],
+    },
+  ];
+
+  return (
+    <Accordion type="single" collapsible className="w-full">
+      {dummyIncidents.map((incident) => (
+        <AccordionItem key={incident.id} value={incident.id}>
+          <AccordionTrigger>
+            Incident #{incident.id} | Events: {incident.events.length}
+          </AccordionTrigger>
+          <AccordionContent>
+            <IncidentTimeline incident={incident} />
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   );
 };
