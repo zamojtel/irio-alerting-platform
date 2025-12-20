@@ -25,7 +25,7 @@ func main() {
 	}
 
 	dbConn := db.GetDBConnection()
-	dbConn.AutoMigrate(&db.User{})
+	dbConn.AutoMigrate(&db.User{}, &db.MonitoredService{})
 
 	var wg sync.WaitGroup
 

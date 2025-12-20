@@ -1,7 +1,4 @@
-import {
-  type MonitoredService,
-  type ServiceStatus,
-} from "@/lib/fetchers/service";
+import { type MonitoredService } from "@/lib/api/service";
 import {
   flexRender,
   getCoreRowModel,
@@ -52,7 +49,7 @@ const createSortableHeader = ({
   );
 };
 
-const columns: ColumnDef<MonitoredService>[] = [
+const columns: ColumnDef<MonitoredService, MonitoredService>[] = [
   {
     accessorKey: "status",
     header: (data) => createSortableHeader({ name: "Status", ...data }),
@@ -60,8 +57,7 @@ const columns: ColumnDef<MonitoredService>[] = [
       <div className="capitalize w-25">
         <Badge
           style={{
-            backgroundColor:
-              serviceStatusToColor[row.getValue("status") as ServiceStatus],
+            backgroundColor: serviceStatusToColor[row.original.status],
           }}
         >
           {row.getValue("status")}
@@ -73,7 +69,7 @@ const columns: ColumnDef<MonitoredService>[] = [
     accessorKey: "name",
     header: (data) => createSortableHeader({ name: "Name", ...data }),
     cell: ({ row }) => (
-      <div className="capitalize w-50">{row.getValue("name")}</div>
+      <div className="capitalize w-50">{row.original.name}</div>
     ),
   },
   {
@@ -81,22 +77,27 @@ const columns: ColumnDef<MonitoredService>[] = [
     header: (data) => createSortableHeader({ name: "URL", ...data }),
     cell: ({ row }) => (
       <div className="w-75 underline">
-        {<a href={row.getValue("url")}>{row.getValue("url")}</a>}
+        {<a href={row.original.url}>{row.original.url}</a>}
       </div>
     ),
   },
   {
     accessorKey: "port",
     header: (data) => createSortableHeader({ name: "Port", ...data }),
-    cell: ({ row }) => <div className="w-15">{row.getValue("port")}</div>,
+    cell: ({ row }) => <div className="w-15">{row.original.port}</div>,
   },
   {
     accessorKey: "oncallers",
     header: "Oncallers",
-    cell: ({ row }) => (
-      <div className="w-50 flex gap-4">
-        {(row.getValue("oncallers") as string[]).map(
-          (oncaller: string, index: number) => (
+    cell: ({ row }) => {
+      const oncallers = [
+        row.original.firstOncallerEmail,
+        row.original.secondOncallerEmail,
+      ].filter((v) => v != null) as string[];
+
+      return (
+        <div className="w-50 flex gap-4">
+          {oncallers.map((oncaller: string, index: number) => (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Avatar key={index}>
@@ -108,10 +109,10 @@ const columns: ColumnDef<MonitoredService>[] = [
               </TooltipTrigger>
               <TooltipContent>{oncaller}</TooltipContent>
             </Tooltip>
-          )
-        )}
-      </div>
-    ),
+          ))}
+        </div>
+      );
+    },
     enableSorting: false,
   },
 ];
@@ -126,6 +127,7 @@ export const ServiceList = ({ services }: Props) => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: services,
     columns,

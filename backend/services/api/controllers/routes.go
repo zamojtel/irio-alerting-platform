@@ -26,11 +26,12 @@ func RegisterRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	authenticated := v1.Group("/", authMiddleware.MiddlewareFunc())
 	{
 		authenticated.POST("/logout", authMiddleware.LogoutHandler)
-		authenticated.GET("/hello", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "Hello, authenticated user!",
-			})
-		})
+
+		services := authenticated.Group("/services")
+		{
+			services.POST("/", CreateMonitoredService)
+			services.GET("/me", GetMyMonitoredServices)
+		}
 	}
 }
 

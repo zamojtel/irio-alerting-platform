@@ -13,11 +13,16 @@ import (
 	jwt_go "github.com/golang-jwt/jwt/v5"
 )
 
-const identityKey = "email"
+const IdentityKey = "userID"
+
+type JWTUser struct {
+	ID    uint
+	Email string
+}
 
 func GetJWTMiddleware() *jwt.GinJWTMiddleware {
 	middleware := &jwt.GinJWTMiddleware{
-		IdentityKey:     identityKey,
+		IdentityKey:     IdentityKey,
 		Key:             []byte(config.GetConfig().Secret),
 		Timeout:         time.Minute * 15,
 		MaxRefresh:      time.Hour * 24,
@@ -48,7 +53,7 @@ func GetJWTMiddleware() *jwt.GinJWTMiddleware {
 
 func authenticator() func(c *gin.Context) (any, error) {
 	return func(c *gin.Context) (any, error) {
-		var loginVals dto.LoginInput
+		var loginVals dto.LoginRequest
 		if err := c.ShouldBind(&loginVals); err != nil {
 			return "", jwt.ErrMissingLoginValues
 		}
@@ -67,24 +72,29 @@ func authenticator() func(c *gin.Context) (any, error) {
 			return nil, jwt.ErrFailedAuthentication
 		}
 
-		return &user, nil
+		return &JWTUser{
+			ID:    user.ID,
+			Email: user.Email,
+		}, nil
 	}
 }
 
 func identityHandler() func(c *gin.Context) any {
 	return func(c *gin.Context) any {
 		claims := jwt.ExtractClaims(c)
-		return &db.User{
-			Email: claims[identityKey].(string),
+		return &JWTUser{
+			ID:    uint(claims[IdentityKey].(float64)),
+			Email: claims["email"].(string),
 		}
 	}
 }
 
 func payloadFunc() func(data any) jwt_go.MapClaims {
 	return func(data any) jwt_go.MapClaims {
-		if v, ok := data.(*db.User); ok {
+		if v, ok := data.(*JWTUser); ok {
 			return jwt_go.MapClaims{
-				identityKey: v.Email,
+				IdentityKey: v.ID,
+				"email":     v.Email,
 			}
 		}
 		return jwt_go.MapClaims{}

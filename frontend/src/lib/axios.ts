@@ -46,15 +46,10 @@ axios.interceptors.response.use(
             });
 
             const res = await refreshReq;
-
-            const { access_token, refresh_token } = res.data;
-            localStorage.setItem(
-              "jwt",
-              JSON.stringify({
-                access_token,
-                refresh_token,
-              })
-            );
+            localStorage.setItem("jwt", {
+              ...JSON.parse(localStorage.getItem("jwt") || "{}"),
+              ...res.data,
+            });
           } else {
             await lock;
           }

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldContent,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -11,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import type { MonitoredService } from "@/lib/fetchers/service";
+import type { Minutes, MonitoredService, Seconds } from "@/lib/api/service";
 import {
   InputGroup,
   InputGroupAddon,
@@ -19,9 +20,10 @@ import {
   InputGroupInput,
 } from "../ui/input-group";
 import { XIcon } from "lucide-react";
+import { DialogClose } from "../ui/dialog";
 
 type CreateServiceFormProps = {
-  onSubmit?: (data: Pick<MonitoredService, "name" | "url" | "port">) => void;
+  onSubmit?: (data: Omit<MonitoredService, "id" | "status">) => void;
 };
 
 const formSchema = z.object({
@@ -75,6 +77,11 @@ export function CreateServiceForm({
         name: value.name,
         url: value.url,
         port: Number(value.port),
+        allowedResponseTime: Number(value.allowedResponseTime) as Minutes,
+        healthCheckInterval: Number(value.healthCheckInterval) as Seconds,
+        alertWindow: Number(value.alertWindow) as Seconds,
+        firstOncallerEmail: value.oncallers[0].email,
+        secondOncallerEmail: value.oncallers[1]?.email,
       });
     },
   });
@@ -266,6 +273,9 @@ export function CreateServiceForm({
               return (
                 <FieldSet className="gap-4">
                   <FieldLegend variant="label">Oncallers</FieldLegend>
+                  <FieldDescription>
+                    Order determines who is contacted first
+                  </FieldDescription>
 
                   <FieldGroup className="gap-4">
                     {field.state.value.map((_, index) => (
@@ -337,7 +347,9 @@ export function CreateServiceForm({
             }}
           </form.Field>
           <Field className="mt-5">
-            <Button type="submit">Create</Button>
+            <DialogClose asChild>
+              <Button type="submit">Create</Button>
+            </DialogClose>
           </Field>
         </FieldGroup>
       </form>

@@ -9,7 +9,7 @@ import (
 )
 
 func RegisterUser(c *gin.Context) {
-	var registerInput dto.RegisterInput
+	var registerInput dto.RegisterRequest
 
 	if err := c.ShouldBind(&registerInput); err != nil {
 		c.JSON(400, gin.H{"message": "Invalid input", "error": err.Error()})
@@ -18,7 +18,7 @@ func RegisterUser(c *gin.Context) {
 
 	passwordHash, err := utils.HashPassword(registerInput.Password)
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Internal server error"})
+		c.JSON(500, gin.H{"message": "Failed to hash password", "error": err.Error()})
 		return
 	}
 
